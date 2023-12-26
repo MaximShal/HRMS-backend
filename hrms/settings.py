@@ -11,6 +11,10 @@ https://docs.djangoproject.com/en/4.2/ref/settings/
 """
 
 from pathlib import Path
+from environs import Env
+
+env = Env()
+env.read_env(override=True)
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -23,9 +27,9 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 SECRET_KEY = 'django-insecure-cf1urvgpdu^!!uqkg(y829+%he$t5@2m!e#4l=m3*z*zffl6ge'
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = env.bool("HRMS_DEBUG")
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = env.list("HRMS_ALLOWED_HOSTS", [], subcast=str)
 
 
 # Application definition
@@ -37,6 +41,7 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'rest_framework',
 ]
 
 MIDDLEWARE = [
@@ -75,8 +80,12 @@ WSGI_APPLICATION = 'hrms.wsgi.application'
 
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
+        'ENGINE': 'django.db.backends.postgresql',
+        "NAME": env("HRMS_DB_NAME"),
+        "HOST": env("HRMS_DB_HOST"),
+        "PORT": env.int("HRMS_DB_PORT"),
+        "USER": env("HRMS_DB_USERNAME"),
+        "PASSWORD": env("HRMS_DB_PASSWORD"),
     }
 }
 

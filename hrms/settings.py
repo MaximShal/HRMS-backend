@@ -31,6 +31,7 @@ DEBUG = env.bool("HRMS_DEBUG")
 
 ALLOWED_HOSTS = env.list("HRMS_ALLOWED_HOSTS", [], subcast=str)
 
+AUTH_USER_MODEL = 'company.Users'
 
 # Application definition
 
@@ -42,6 +43,8 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'rest_framework',
+
+    'company',
 ]
 
 MIDDLEWARE = [

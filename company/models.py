@@ -1,5 +1,22 @@
+from django.contrib.auth.base_user import BaseUserManager
 from django.contrib.auth.models import AbstractUser
 from django.db import models
+
+
+class CustomUserManager(BaseUserManager):
+    def create_user(self, email, password=None, **extra_fields):
+        if not email:
+            raise ValueError('The Email field must be set')
+        email = self.normalize_email(email)
+        user = self.model(email=email, **extra_fields)
+        user.set_password(password)
+        user.save(using=self._db)
+        return user
+
+    def create_superuser(self, email, password=None, **extra_fields):
+        extra_fields.setdefault('is_staff', True)
+        extra_fields.setdefault('is_superuser', True)
+        return self.create_user(email, password, **extra_fields)
 
 
 class Company(models.Model):            # Can create only First user, creating with registration
@@ -10,6 +27,8 @@ class Company(models.Model):            # Can create only First user, creating w
 
 
 class Users(AbstractUser):
+    username = None
+    email = models.EmailField(unique=True)
     company = models.ForeignKey(Company, on_delete=models.CASCADE, null=True, blank=True)
     address = models.TextField(max_length=255, blank=True)
     phone_number = models.CharField(max_length=20, blank=True)
@@ -19,6 +38,11 @@ class Users(AbstractUser):
     department = models.TextField(max_length=100, blank=True)
     job_title = models.TextField(max_length=100, blank=True)
     date_of_birth = models.DateField(null=True, blank=True)
+
+    USERNAME_FIELD = 'email'
+    REQUIRED_FIELDS = ['password']
+
+    objects = CustomUserManager()
 
     def delete(self, *args, **kwargs):
         # ReId of user if inviter was deleted

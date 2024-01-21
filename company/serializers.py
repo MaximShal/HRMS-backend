@@ -1,6 +1,8 @@
-from rest_framework import serializers
 from django.contrib.auth.password_validation import validate_password
-from .models import Company, Roles, Users, UserRoleConnections
+
+from rest_framework import serializers
+
+from company.models import Company, Roles, UserRoleConnections, Users
 
 
 class CompanyCreateSerializer(serializers.ModelSerializer):

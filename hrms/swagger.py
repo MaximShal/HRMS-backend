@@ -1,6 +1,8 @@
-from drf_yasg.views import get_schema_view
+from django.urls import include, path
+
 from drf_yasg import openapi
-from django.urls import path, include
+from drf_yasg.views import get_schema_view
+
 from hrms.api_urls import urlpatterns
 
 

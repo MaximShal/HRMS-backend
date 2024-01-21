@@ -1,6 +1,7 @@
-from rest_framework import viewsets, generics
-from rest_framework.response import Response
+from rest_framework import generics, viewsets
 from rest_framework import status
+from rest_framework.response import Response
+
 from company.serializers import CompanyCreateSerializer, UserSerializer
 from company.models import Users
 from company.permissions import UsersPermissions
@@ -28,4 +29,3 @@ class UserViewSet(viewsets.ModelViewSet):
     def list(self, request, *args, **kwargs):
         return Response(status=status.HTTP_200_OK,
                         data=self.get_serializer(self.queryset.filter(company_id=request.user.company), many=True).data)
-

@@ -1,6 +1,7 @@
 from django.contrib import admin
-from .models import (Company, Users, Roles, Operations, Resources, Permissions, RolePermissionConnections,
-                     UserRoleConnections)
+
+from .models import (Company, Operations, Permissions, Resources, RolePermissionConnections, Roles, UserRoleConnections,
+                     Users)
 
 
 @admin.register(Company)

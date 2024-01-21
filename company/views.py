@@ -1,8 +1,9 @@
 from rest_framework import viewsets, generics
 from rest_framework.response import Response
 from rest_framework import status
-from .serializers import CompanyCreateSerializer, UserSerializer
-from .models import Users
+from company.serializers import CompanyCreateSerializer, UserSerializer
+from company.models import Users
+from company.permissions import UsersPermissions
 
 
 class CompanyCreateView(generics.CreateAPIView):
@@ -22,4 +23,9 @@ class CompanyCreateView(generics.CreateAPIView):
 class UserViewSet(viewsets.ModelViewSet):
     queryset = Users.objects.all()
     serializer_class = UserSerializer
-    # permission_classes = [CanInteractWithUserAPI]
+    permission_classes = [UsersPermissions]
+
+    def list(self, request, *args, **kwargs):
+        return Response(status=status.HTTP_200_OK,
+                        data=self.get_serializer(self.queryset.filter(company_id=request.user.company), many=True).data)
+

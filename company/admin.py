@@ -5,7 +5,7 @@ from .models import (Company, Users, Roles, Operations, Resources, Permissions, 
 
 @admin.register(Company)
 class CompanyAdmin(admin.ModelAdmin):
-    list_display = ['company_name']
+    list_display = ['name']
 
 
 @admin.register(Users)
@@ -18,17 +18,17 @@ class UsersAdmin(admin.ModelAdmin):
 
 @admin.register(Roles)
 class RolesAdmin(admin.ModelAdmin):
-    list_display = ['role_name']
+    list_display = ['name']
 
 
 @admin.register(Operations)
 class OperationsAdmin(admin.ModelAdmin):
-    list_display = ['operation_name']
+    list_display = ['name']
 
 
 @admin.register(Resources)
 class ResourcesAdmin(admin.ModelAdmin):
-    list_display = ['resource_name']
+    list_display = ['name']
 
 
 @admin.register(Permissions)
@@ -38,9 +38,9 @@ class PermissionsAdmin(admin.ModelAdmin):
 
 @admin.register(RolePermissionConnections)
 class RolePermissionConnectionsAdmin(admin.ModelAdmin):
-    list_display = ['role_id', 'permission_id']
+    list_display = ['role', 'permission']
 
 
 @admin.register(UserRoleConnections)
 class UserRoleConnectionsAdmin(admin.ModelAdmin):
-    list_display = ['user_id', 'role_id']
+    list_display = ['user', 'role']

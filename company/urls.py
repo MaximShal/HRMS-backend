@@ -4,9 +4,9 @@ from company.views import CompanyCreateView, UserViewSet
 
 
 router = DefaultRouter()
-router.register("", UserViewSet, basename="users")
+router.register("user", UserViewSet, basename="user")
 
 urlpatterns = [
     path('company-create/', CompanyCreateView.as_view(), name='company-registration'),
-    path("users/", include(router.urls)),
+    path("", include(router.urls)),
 ]

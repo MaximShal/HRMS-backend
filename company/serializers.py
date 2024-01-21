@@ -12,7 +12,7 @@ class CompanyCreateSerializer(serializers.ModelSerializer):
         fields = ['email', 'password', 'password_confirm', 'company_name']
 
     def validate(self, data):
-        if data['password'] != data['password_confirm']:
+        if data['password'] != data.pop('password_confirm'):
             raise serializers.ValidationError("Check the password")
 
         validate_password(data['password'])
@@ -21,23 +21,21 @@ class CompanyCreateSerializer(serializers.ModelSerializer):
 
     def create(self, validated_data):
         company_name = validated_data.pop('company_name')
-        validated_data.pop('password_confirm')
-
-        company = Company.objects.create(company_name=company_name)
+        company = Company.objects.create(name=company_name)
 
         user = Users.objects.create_user(**validated_data)
         user.company = company
+        user.is_staff = True
         user.save()
 
         # Назначение роли "companyowner"
-        company_owner_role = Roles.objects.get(role_name='companyowner')
-        UserRoleConnections.objects.create(user_id=user, role_id=company_owner_role)
+        company_owner_role, flag = Roles.objects.get_or_create(name='companyowner')
+        UserRoleConnections.objects.create(user_id=user.id, role_id=company_owner_role.id)
         return user
 
 
 class UserSerializer(serializers.ModelSerializer):
-    password = serializers.CharField(write_only=True)
-
     class Meta:
         model = Users
         fields = "__all__"
+        extra_kwargs = {"password": {"write_only": True}}

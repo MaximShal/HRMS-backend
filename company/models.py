@@ -20,10 +20,10 @@ class CustomUserManager(BaseUserManager):
 
 
 class Company(models.Model):            # Can create only First user, creating with registration
-    company_name = models.CharField(max_length=255)
+    name = models.CharField(max_length=255)
 
     def __str__(self):
-        return self.company_name
+        return self.name
 
 
 class Users(AbstractUser):
@@ -53,24 +53,24 @@ class Users(AbstractUser):
 
 
 class Roles(models.Model):        # Roles
-    role_name = models.CharField(max_length=100)
+    name = models.CharField(max_length=100)
 
     def __str__(self):
-        return self.role_name
+        return self.name
 
 
 class Operations(models.Model):            # CRUD What operations can do user by his role
-    operation_name = models.CharField(max_length=100)
+    name = models.CharField(max_length=100)
 
     def __str__(self):
-        return self.operation_name
+        return self.name
 
 
 class Resources(models.Model):            # Fields what user can change
-    resource_name = models.CharField(max_length=100)
+    name = models.CharField(max_length=100)
 
     def __str__(self):
-        return self.resource_name
+        return self.name
 
 
 class Permissions(models.Model):          # Connect Operations and Resources
@@ -78,14 +78,14 @@ class Permissions(models.Model):          # Connect Operations and Resources
     resource = models.ForeignKey(Resources, on_delete=models.CASCADE)
 
     def __str__(self):
-        return f"{self.operation.operation_name} - {self.resource.resource_name}"
+        return f"{self.operation.name} - {self.resource.name}"
 
 
 class RolePermissionConnections(models.Model):
-    role_id = models.ForeignKey(Roles, on_delete=models.CASCADE)
-    permission_id = models.ForeignKey(Permissions, on_delete=models.CASCADE)
+    role = models.ForeignKey(Roles, on_delete=models.CASCADE)
+    permission = models.ForeignKey(Permissions, on_delete=models.CASCADE)
 
 
 class UserRoleConnections(models.Model):
-    user_id = models.ForeignKey(Users, on_delete=models.CASCADE)
-    role_id = models.ForeignKey(Roles, on_delete=models.CASCADE)
+    user = models.ForeignKey(Users, on_delete=models.CASCADE)
+    role = models.ForeignKey(Roles, on_delete=models.CASCADE)

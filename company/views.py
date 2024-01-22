@@ -5,6 +5,8 @@ from rest_framework.response import Response
 from company.serializers import CompanyCreateSerializer, UserSerializer
 from company.models import Users
 from company.permissions import UsersPermissions
+from company.documentation.schemas_settings import user_doc
+from hrms.decorators import viewset_swagger
 
 
 class CompanyCreateView(generics.CreateAPIView):
@@ -21,6 +23,7 @@ class CompanyCreateView(generics.CreateAPIView):
                         status=status.HTTP_201_CREATED, headers=headers)
 
 
+@viewset_swagger("user", additional_data=user_doc)
 class UserViewSet(viewsets.ModelViewSet):
     queryset = Users.objects.all()
     serializer_class = UserSerializer

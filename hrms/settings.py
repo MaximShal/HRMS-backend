@@ -185,6 +185,3 @@ SIMPLE_JWT = {
     "SLIDING_TOKEN_REFRESH_SERIALIZER": "rest_framework_simplejwt.serializers.TokenRefreshSlidingSerializer",
 }
 
-SWAGGER_SETTINGS = {
-    "USE_SESSION_AUTH": False,
-}

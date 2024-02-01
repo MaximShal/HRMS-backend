@@ -1,12 +1,12 @@
 from django.contrib import admin
 
-from .models import (Company, Operations, Permissions, Resources, RolePermissionConnections, Roles, UserRoleConnections,
-                     Users)
+from .models import (Company, Operations, Permissions, Resources, RolePermissionConnections, Roles,
+                     UserRoleConnections, Users,)
 
 
 @admin.register(Company)
 class CompanyAdmin(admin.ModelAdmin):
-    list_display = ['name']
+    list_display = ['company_name']
 
 
 @admin.register(Users)
@@ -19,17 +19,17 @@ class UsersAdmin(admin.ModelAdmin):
 
 @admin.register(Roles)
 class RolesAdmin(admin.ModelAdmin):
-    list_display = ['name']
+    list_display = ['role_name']
 
 
 @admin.register(Operations)
 class OperationsAdmin(admin.ModelAdmin):
-    list_display = ['name']
+    list_display = ['operation_name']
 
 
 @admin.register(Resources)
 class ResourcesAdmin(admin.ModelAdmin):
-    list_display = ['name']
+    list_display = ['resource_name']
 
 
 @admin.register(Permissions)
@@ -39,9 +39,9 @@ class PermissionsAdmin(admin.ModelAdmin):
 
 @admin.register(RolePermissionConnections)
 class RolePermissionConnectionsAdmin(admin.ModelAdmin):
-    list_display = ['role', 'permission']
+    list_display = ['role_id', 'permission_id']
 
 
 @admin.register(UserRoleConnections)
 class UserRoleConnectionsAdmin(admin.ModelAdmin):
-    list_display = ['user', 'role']
+    list_display = ['user_id', 'role_id']

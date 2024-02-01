@@ -1,15 +1,24 @@
-from django.urls import reverse
-
 from rest_framework import permissions
 
+from .models import Permissions, UserRoleConnections
 
-class UsersPermissions(permissions.BasePermission):
+
+class CustomPermission(permissions.BasePermission):
     def has_permission(self, request, view):
-        if request.method == "GET":
-            if request.path == reverse("user-list"):
-                return request.user.is_staff
-            return request.user.is_authenticated
-        return False
+        user = request.user
 
-    def has_object_permission(self, request, view, obj):
-        return obj.pk == request.user.id or all([request.user.is_staff, obj.company.id == request.user.company.id])
+        if user.is_staff:
+            return True
+
+        http_method = request.method.lower()
+        view_name = view.__class__.__name__
+
+        user_roles = UserRoleConnections.objects.filter(user_id=user.id)
+        user_permissions = Permissions.objects.filter(
+            rolepermissionconnections__role_id__in=user_roles.values_list('role_id', flat=True)
+        ).distinct()
+
+        if user_permissions.filter(operation__operation_name=http_method, resource__resource_name=view_name).exists():
+            return True
+
+        return False

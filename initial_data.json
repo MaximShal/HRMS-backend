@@ -1,0 +1,192 @@
+[
+  {
+    "model": "company.operations",
+    "pk": 1,
+    "fields": {
+      "operation_name": "get"
+    }
+  },
+  {
+    "model": "company.operations",
+    "pk": 2,
+    "fields": {
+      "operation_name": "post"
+    }
+  },
+  {
+    "model": "company.operations",
+    "pk": 3,
+    "fields": {
+      "operation_name": "put"
+    }
+  },
+  {
+    "model": "company.operations",
+    "pk": 4,
+    "fields": {
+      "operation_name": "patch"
+    }
+  },
+  {
+    "model": "company.operations",
+    "pk": 5,
+    "fields": {
+      "operation_name": "delete"
+    }
+  },
+  {
+    "model": "company.resources",
+    "pk": 1,
+    "fields": {
+      "resource_name": "UserViewSet"
+    }
+  },
+  {
+    "model": "company.roles",
+    "pk": 1,
+    "fields": {
+      "role_name": "companyowner"
+    }
+  },
+  {
+    "model": "company.roles",
+    "pk": 2,
+    "fields": {
+      "role_name": "HR"
+    }
+  },
+  {
+    "model": "company.roles",
+    "pk": 3,
+    "fields": {
+      "role_name": "Employee"
+    }
+  },
+  {
+    "model": "company.roles",
+    "pk": 4,
+    "fields": {
+      "role_name": "Manager"
+    }
+  },
+  {
+    "model": "company.permissions",
+    "pk": 1,
+    "fields": {
+      "operation": 1,
+      "resource": 1
+    }
+  },
+  {
+    "model": "company.permissions",
+    "pk": 2,
+    "fields": {
+      "operation": 2,
+      "resource": 1
+    }
+  },
+  {
+    "model": "company.permissions",
+    "pk": 3,
+    "fields": {
+      "operation": 3,
+      "resource": 1
+    }
+  },
+  {
+    "model": "company.permissions",
+    "pk": 4,
+    "fields": {
+      "operation": 4,
+      "resource": 1
+    }
+  },
+  {
+    "model": "company.permissions",
+    "pk": 5,
+    "fields": {
+      "operation": 5,
+      "resource": 1
+    }
+  },
+  {
+    "model": "company.rolepermissionconnections",
+    "pk": 1,
+    "fields": {
+      "role_id": 2,
+      "permission_id": 1
+    }
+  },
+  {
+    "model": "company.rolepermissionconnections",
+    "pk": 2,
+    "fields": {
+      "role_id": 2,
+      "permission_id": 2
+    }
+  },
+  {
+    "model": "company.rolepermissionconnections",
+    "pk": 3,
+    "fields": {
+      "role_id": 2,
+      "permission_id": 3
+    }
+  },
+  {
+    "model": "company.rolepermissionconnections",
+    "pk": 4,
+    "fields": {
+      "role_id": 2,
+      "permission_id": 4
+    }
+  },
+  {
+    "model": "company.rolepermissionconnections",
+    "pk": 5,
+    "fields": {
+      "role_id": 2,
+      "permission_id": 5
+    }
+  },
+  {
+    "model": "company.rolepermissionconnections",
+    "pk": 6,
+    "fields": {
+      "role_id": 4,
+      "permission_id": 1
+    }
+  },
+  {
+    "model": "company.rolepermissionconnections",
+    "pk": 7,
+    "fields": {
+      "role_id": 4,
+      "permission_id": 2
+    }
+  },
+  {
+    "model": "company.rolepermissionconnections",
+    "pk": 8,
+    "fields": {
+      "role_id": 4,
+      "permission_id": 3
+    }
+  },
+  {
+    "model": "company.rolepermissionconnections",
+    "pk": 9,
+    "fields": {
+      "role_id": 4,
+      "permission_id": 4
+    }
+  },
+  {
+    "model": "company.rolepermissionconnections",
+    "pk": 10,
+    "fields": {
+      "role_id": 4,
+      "permission_id": 5
+    }
+  }
+]

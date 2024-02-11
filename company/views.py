@@ -3,6 +3,8 @@ from rest_framework import status
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.views import APIView
+from company.documentation.schemas_settings import user_doc
+from hrms.decorators import viewset_swagger
 
 from .models import Users
 from .permissions import CustomPermission
@@ -32,6 +34,7 @@ class UserProfileAPIView(APIView):
         return Response(serializer.data, status=status.HTTP_200_OK)
 
 
+@viewset_swagger("user", additional_data=user_doc)
 class UserViewSet(viewsets.ModelViewSet):
     queryset = Users.objects.all()
     serializer_class = UserSerializer

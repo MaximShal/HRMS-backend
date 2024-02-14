@@ -1,3 +1,6 @@
+import random
+import string
+
 from django.contrib.auth.password_validation import validate_password
 
 from rest_framework import serializers
@@ -40,32 +43,52 @@ class RegistrationSerializer(serializers.ModelSerializer):
 
 
 class UserSerializer(serializers.ModelSerializer):
-    password_confirm = serializers.CharField(write_only=True)
     role = serializers.CharField(write_only=True)
+    password = serializers.CharField(write_only=True, required=False)
 
     class Meta:
         model = Users
         fields = "__all__"
-        extra_kwargs = {"password": {"write_only": True}}
-
-    def validate(self, data):
-        if data.get('password') != data.get('password_confirm'):
-            raise serializers.ValidationError("Password and password confirmation do not match.")
-
-        return data
 
     def create(self, validated_data):
+        password = ''.join(random.choices(string.ascii_letters + string.digits, k=12))
         is_superuser = validated_data.pop('is_superuser', False)
         is_staff = validated_data.pop('is_staff', False)
         if is_superuser or is_staff:
             raise serializers.ValidationError("Permission Denied")
 
-        validated_data.pop('password_confirm', None)
         role = validated_data.pop('role')
         if role is None:
             role = 'Employee'
         user = Users.objects.create_user(**validated_data)
+
+        user.set_password(password)
         user.save()
         user_role = Roles.objects.get(role_name=role)
         UserRoleConnections.objects.create(user_id=user, role_id=user_role)
+        return user
+
+
+class InviteRegistrationSerializer(serializers.ModelSerializer):
+    password_confirm = serializers.CharField(write_only=True)
+    invite_token = serializers.UUIDField()
+
+    class Meta:
+        model = Users
+        fields = ('password', 'password_confirm', 'invite_token')
+
+    def validate(self, data):
+        if data['password'] != data['password_confirm']:
+            raise serializers.ValidationError("Check the password")
+
+        validate_password(data['password'])
+
+        return data
+
+    def create(self, validated_data):
+        user = Users.objects.get(invite_token=validated_data.pop('invite_token'))
+        user.set_password(validated_data.pop('password'))
+        user.save()
+        user.invite_token = None
+        user.save()
         return user

@@ -1,14 +1,22 @@
+from uuid import uuid4
+
 from rest_framework import generics, viewsets
 from rest_framework import status
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.views import APIView
+
 from company.documentation.schemas_settings import user_doc
+
 from hrms.decorators import viewset_swagger
+
+from django.urls import reverse
+from django.core.mail import send_mail
+from django.conf import settings
 
 from .models import Users
 from .permissions import CustomPermission
-from .serializers import RegistrationSerializer, UserSerializer
+from .serializers import RegistrationSerializer, UserSerializer, InviteRegistrationSerializer
 
 
 class RegistrationView(generics.CreateAPIView):
@@ -45,7 +53,24 @@ class UserViewSet(viewsets.ModelViewSet):
 
         serializer.validated_data['invited_by'] = current_user
         serializer.validated_data['company'] = current_user.company
+
+        invite_token = uuid4()
+        serializer.validated_data['invite_token'] = invite_token
         serializer.save()
+
+        self.send_invitation_email(serializer.instance)
+
+    def send_invitation_email(self, user):
+        registration_url = reverse('invite-registration') + f'?token={user.invite_token}'
+        # message = f"Limk to complete the registration: {settings.BASE_URL}{registration_url}"
+        message = f"Limk to complete the registration: {registration_url}"
+        send_mail(
+            'Registration invite',
+            message,
+            settings.DEFAULT_FROM_EMAIL,
+            [user.email],
+            fail_silently=False,
+        )
 
     def list(self, request, *args, **kwargs):
         queryset = self.filter_queryset(self.get_queryset())
@@ -75,3 +100,14 @@ class UserViewSet(viewsets.ModelViewSet):
             return Response({"detail": "Permission denied."}, status=403)
         self.perform_destroy(instance)
         return Response(status=204)
+
+
+class InviteRegistrationView(generics.CreateAPIView):
+    serializer_class = InviteRegistrationSerializer
+
+    def post(self, request, *args, **kwargs):
+        serializer = self.get_serializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        user = serializer.save()
+
+        return Response({"detail": "Registration successful"}, status=status.HTTP_201_CREATED)

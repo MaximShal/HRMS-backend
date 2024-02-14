@@ -1,3 +1,5 @@
+import uuid
+
 from django.contrib.auth.base_user import BaseUserManager
 from django.contrib.auth.models import AbstractUser
 from django.db import models
@@ -38,6 +40,7 @@ class Users(AbstractUser):
     department = models.TextField(max_length=100, blank=True)
     job_title = models.TextField(max_length=100, blank=True)
     date_of_birth = models.DateField(null=True, blank=True)
+    invite_token = models.UUIDField(editable=False, null=True, blank=True)
 
     USERNAME_FIELD = 'email'
     REQUIRED_FIELDS = ['password']

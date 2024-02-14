@@ -19,7 +19,6 @@ from django.urls import include, path
 
 from hrms.swagger import SchemaView
 
-
 urlpatterns = [
     path('admin/', admin.site.urls),
     path("api/v1/", include("hrms.api_urls"), name="api-v1"),

@@ -23,6 +23,8 @@ user_doc = {
     },
     "create": {
         "operation_description": "Create user model object and userprofile model object for it",
+        "manual_parameters": [AUTH_TOKEN_SCHEMA],
+
     },
     "retrieve": {
         "operation_description": "Return user model object by id",

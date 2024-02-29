@@ -46,9 +46,19 @@ class UserSerializer(serializers.ModelSerializer):
     role = serializers.CharField(write_only=True)
     password = serializers.CharField(write_only=True, required=False)
 
+    return_fields = (
+        'id', 'email', 'last_login', 'first_name', 'last_name', 'date_joined', 'phone_number', 'gender', 'department',
+        'job_title', 'date_of_birth', 'address', 'company', 'invited_by'
+    )
+
     class Meta:
         model = Users
         fields = "__all__"
+
+    def to_representation(self, instance):
+        data = super().to_representation(instance)
+        # Delete fields in response except return_fields
+        return {key: value for key, value in data.items() if key in self.return_fields}
 
     def create(self, validated_data):
         password = ''.join(random.choices(string.ascii_letters + string.digits, k=12))

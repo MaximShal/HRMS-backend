@@ -68,8 +68,9 @@ class UserSerializer(serializers.ModelSerializer):
             raise serializers.ValidationError("Permission Denied")
 
         role = validated_data.pop('role')
-        if role is None:
-            role = 'Employee'
+        if role == "companyowner":
+            raise serializers.ValidationError("Access Denied: companyowner role not allowed.")
+        role = role if Roles.objects.filter(role_name=role).exists() else 'Employee'
         user = Users.objects.create_user(**validated_data)
 
         user.set_password(password)

@@ -12,4 +12,5 @@ exclude =
     # Our tests its only our business =)
     tests.py,
     tests
+ignore = DJ08
 max-complexity = 10

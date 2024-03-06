@@ -1,22 +1,22 @@
 from uuid import uuid4
 
+from company.documentation.schemas_settings import user_doc
+
+from django.conf import settings
+from django.core.mail import send_mail
+from django.urls import reverse
+
+from hrms.decorators import viewset_swagger
+
 from rest_framework import generics, viewsets
 from rest_framework import status
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
-from company.documentation.schemas_settings import user_doc
-
-from hrms.decorators import viewset_swagger
-
-from django.urls import reverse
-from django.core.mail import send_mail
-from django.conf import settings
-
 from .models import Users
 from .permissions import CustomPermission
-from .serializers import RegistrationSerializer, UserSerializer, InviteRegistrationSerializer
+from .serializers import InviteRegistrationSerializer, RegistrationSerializer, UserSerializer
 
 
 class RegistrationView(generics.CreateAPIView):
@@ -85,6 +85,12 @@ class InviteRegistrationView(generics.CreateAPIView):
     def post(self, request, *args, **kwargs):
         serializer = self.get_serializer(data=request.data)
         serializer.is_valid(raise_exception=True)
+
+        invite_token = serializer.validated_data.get('invite_token')
+        user = Users.objects.filter(invite_token=invite_token).first()
+        if not user:
+            return Response({"detail": "Token does not exist"}, status=status.HTTP_400_BAD_REQUEST)
+
         user = serializer.save()
 
         return Response({"detail": "Registration successful"}, status=status.HTTP_201_CREATED)

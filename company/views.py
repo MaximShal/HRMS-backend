@@ -1,6 +1,7 @@
 from uuid import uuid4
 
 from company.documentation.schemas_settings import user_doc
+from company.tasks import send_invitation_email_task
 
 from django.conf import settings
 from django.core.mail import send_mail
@@ -63,20 +64,21 @@ class UserViewSet(viewsets.ModelViewSet):
         invite_token = uuid4()
         serializer.validated_data['invite_token'] = invite_token
         serializer.save()
+        send_invitation_email_task.delay(serializer.instance.id)    # Celery task
 
-        self.send_invitation_email(serializer.instance)
-
-    def send_invitation_email(self, user):
-        registration_url = reverse('invite-registration') + f'?token={user.invite_token}'
-        # message = f"Limk to complete the registration: {settings.BASE_URL}{registration_url}"
-        message = f"Limk to complete the registration: {registration_url}"
-        send_mail(
-            'Registration invite',
-            message,
-            settings.DEFAULT_FROM_EMAIL,
-            [user.email],
-            fail_silently=False,
-        )
+    #     self.send_invitation_email(serializer.instance)
+    #
+    # def send_invitation_email(self, user):
+    #     registration_url = reverse('invite-registration') + f'?token={user.invite_token}'
+    #     # message = f"Limk to complete the registration: {settings.BASE_URL}{registration_url}"
+    #     message = f"Limk to complete the registration: {registration_url}"
+    #     send_mail(
+    #         'Registration invite',
+    #         message,
+    #         settings.DEFAULT_FROM_EMAIL,
+    #         [user.email],
+    #         fail_silently=False,
+    #     )
 
 
 class InviteRegistrationView(generics.CreateAPIView):

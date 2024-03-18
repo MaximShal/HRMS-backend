@@ -19,3 +19,14 @@ def send_invitation_email_task(user_id):
         [user.email],
         fail_silently=False,
     )
+
+
+@shared_task
+def send_password_reset_email_task(email, reset_link):
+    send_mail(
+        'Password reset',
+        f'To reset your password, follow the link: {reset_link}',
+        'from@example.com',
+        [email],
+        fail_silently=False,
+    )

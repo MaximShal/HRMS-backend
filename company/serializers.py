@@ -2,6 +2,7 @@ import random
 import string
 
 from django.contrib.auth.password_validation import validate_password
+from django.core.exceptions import ValidationError
 
 from rest_framework import serializers
 
@@ -103,3 +104,25 @@ class InviteRegistrationSerializer(serializers.ModelSerializer):
         user.invite_token = None
         user.save()
         return user
+
+
+class PasswordResetConfirmSerializer(serializers.Serializer):
+    uidb64 = serializers.CharField(required=True)
+    token = serializers.CharField(required=True)
+    new_password = serializers.CharField(required=True)
+    password_confirm = serializers.CharField(required=True)
+
+    def validate(self, data):
+        if data['new_password'] != data['password_confirm']:
+            raise ValidationError({'new_password': 'Passwords do not match'})
+
+        try:
+            validate_password(data['new_password'])
+        except ValidationError as e:
+            raise ValidationError(e.messages)
+
+        return data
+
+
+class PasswordResetRequestSerializer(serializers.Serializer):
+    email = serializers.EmailField()

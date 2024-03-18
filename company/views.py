@@ -1,23 +1,24 @@
 from uuid import uuid4
 
 from company.documentation.schemas_settings import user_doc
-from company.tasks import send_invitation_email_task
-
-from django.conf import settings
-from django.core.mail import send_mail
-from django.urls import reverse
+from company.tasks import send_invitation_email_task, send_password_reset_email_task
 
 from hrms.decorators import viewset_swagger
 
-from rest_framework import generics, viewsets
-from rest_framework import status
+from rest_framework import viewsets
 from rest_framework.permissions import IsAuthenticated
-from rest_framework.response import Response
 from rest_framework.views import APIView
 
 from .models import Users
 from .permissions import CustomPermission
-from .serializers import InviteRegistrationSerializer, RegistrationSerializer, UserSerializer
+from .serializers import InviteRegistrationSerializer, RegistrationSerializer, UserSerializer, \
+    PasswordResetConfirmSerializer, PasswordResetRequestSerializer
+
+from django.contrib.auth.tokens import PasswordResetTokenGenerator
+from django.utils.encoding import force_bytes
+from django.utils.http import urlsafe_base64_encode, urlsafe_base64_decode
+from rest_framework import generics, status
+from rest_framework.response import Response
 
 
 class RegistrationView(generics.CreateAPIView):
@@ -66,20 +67,6 @@ class UserViewSet(viewsets.ModelViewSet):
         serializer.save()
         send_invitation_email_task.delay(serializer.instance.id)    # Celery task
 
-    #     self.send_invitation_email(serializer.instance)
-    #
-    # def send_invitation_email(self, user):
-    #     registration_url = reverse('invite-registration') + f'?token={user.invite_token}'
-    #     # message = f"Limk to complete the registration: {settings.BASE_URL}{registration_url}"
-    #     message = f"Limk to complete the registration: {registration_url}"
-    #     send_mail(
-    #         'Registration invite',
-    #         message,
-    #         settings.DEFAULT_FROM_EMAIL,
-    #         [user.email],
-    #         fail_silently=False,
-    #     )
-
 
 class InviteRegistrationView(generics.CreateAPIView):
     serializer_class = InviteRegistrationSerializer
@@ -96,3 +83,48 @@ class InviteRegistrationView(generics.CreateAPIView):
         user = serializer.save()
 
         return Response({"detail": "Registration successful"}, status=status.HTTP_201_CREATED)
+
+
+class PasswordResetRequestView(generics.GenericAPIView):
+
+    def post(self, request, *args, **kwargs):
+        email = request.data.get('email')
+        if not email:
+            return Response({'detail': 'Email field is required'}, status=status.HTTP_400_BAD_REQUEST)
+
+        try:
+            user = Users.objects.get(email=email)
+        except Users.DoesNotExist:
+            return Response({'detail': 'User with this email does not exist'}, status=status.HTTP_404_NOT_FOUND)
+
+        # Token generation to reset the pass
+        token_generator = PasswordResetTokenGenerator()
+        uidb64 = urlsafe_base64_encode(force_bytes(user.pk))
+        token = token_generator.make_token(user)
+        reset_link = f"https://yourwebsite.com/reset-password/{uidb64}/{token}/"
+        send_password_reset_email_task.delay(email, reset_link)   # CELERY TASK
+
+        return Response({'detail': 'Email sent'}, status=status.HTTP_200_OK)
+
+
+class PasswordResetConfirmView(generics.GenericAPIView):
+
+    def post(self, request, *args, **kwargs):
+        serializer = PasswordResetConfirmSerializer(data=request.data)
+
+        if serializer.is_valid():
+            data = serializer.data
+
+            try:
+                uid = urlsafe_base64_decode(data['uidb64']).decode()
+                user = Users.objects.get(pk=uid)
+            except (TypeError, ValueError, OverflowError, Users.DoesNotExist):
+                user = None
+
+            if user and PasswordResetTokenGenerator().check_token(user, data['token']):
+                user.set_password(data['new_password'])
+                user.save()
+                return Response({'detail': 'Password reset successfully'}, status=status.HTTP_200_OK)
+            return Response({'detail': 'Invalid token'}, status=status.HTTP_400_BAD_REQUEST)
+
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
